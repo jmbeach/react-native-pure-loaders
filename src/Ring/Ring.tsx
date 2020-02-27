@@ -1,17 +1,23 @@
 import React, { Component } from 'react';
-import { View, Animated, Easing, StyleSheet, Platform } from 'react-native';
+import { View, Animated, Easing, StyleSheet, Platform, LayoutChangeEvent } from 'react-native';
 import { Svg, G, Path } from 'react-native-svg';
 
-const AnimatedG = Animated.createAnimatedComponent(G);
+const AnimatedG = Animated.createAnimatedComponent(G) as any;
 
-class LoadingSpinner extends Component {
+export interface RingProps {
+  color: string;
+}
+
+class Ring extends Component {
   state = {
     offset: 0,
   }
 
+  props: RingProps;
+
   onLayout = Platform.OS === 'android'
-    ? e => { this.setState({ offset: e.nativeEvent.layout.width / 2 }) }
-    : null;
+    ? (e: LayoutChangeEvent) => { this.setState({ offset: e.nativeEvent.layout.width / 2 }) }
+    : undefined;
 
   render() {
     const spins1 = new Animated.Value(0);
@@ -96,7 +102,7 @@ class LoadingSpinner extends Component {
   }
 }
 
-export default LoadingSpinner;
+export default Ring;
 
 const styles = StyleSheet.create({
   wrapper: {
@@ -113,4 +119,4 @@ const styles = StyleSheet.create({
     borderColor: 'transparent',
     borderRadius: 32 // 50%
   }
-});
+})

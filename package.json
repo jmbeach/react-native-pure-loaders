@@ -1,25 +1,21 @@
 {
   "name": "react-native-pure-loaders",
-  "version": "1.0.0",
+  "version": "1.0.6",
   "description": "Pure React Native animated loading icons based on loading.io",
-  "main": "index.js",
+  "main": "lib/index.js",
   "repository": "https://github.com/jmbeach/react-native-pure-loaders",
   "author": "Jared Beach",
   "license": "MIT",
   "private": false,
   "dependencies": {
-    "react": "^16.13.0",
-    "react-native": "^0.61.5",
-    "react-native-svg": "^11.0.1"
+    "react": "~16.9.0"
   },
   "devDependencies": {
-    "@babel/cli": "^7.8.4",
-    "@babel/core": "^7.8.4",
-    "@babel/plugin-proposal-class-properties": "^7.8.3",
-    "@babel/plugin-transform-react-jsx": "^7.8.3",
-    "@babel/preset-env": "^7.8.4"
+    "@types/react": "^16.9.23",
+    "@types/react-native": "^0.61.17",
+    "react-native-svg": "^11.0.1"
   },
   "scripts": {
-    "prepack": "babel src -d lib"
+    "prepack": "tsc --build tsconfig.json"
   }
 }
