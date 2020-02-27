@@ -5,7 +5,17 @@ import Loaders from './lib/index'
 export default function App() {
   return (
     <View style={styles.container}>
-      <Loaders.Ring color="#b3b3b3" />
+      <View style={styles.row}>
+        <View style={styles.loaderContainer}>
+          <Loaders.Ring color="#FFD533" size={128} />
+        </View>
+        <View style={styles.loaderContainer}>
+          <Loaders.Ring />
+        </View>
+      </View>
+      <View style={styles.captionContainer}>
+        <Text style={styles.caption}>{'<Loaders.Ring />'}</Text>
+      </View>
     </View>
   );
 }
@@ -13,8 +23,24 @@ export default function App() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: '#1929FF',
     alignItems: 'center',
     justifyContent: 'center',
   },
+  caption: {
+    color: 'white'
+  },
+  captionContainer: {
+    width: '100%',
+    justifyContent: 'center',
+    flexDirection: 'row'
+  },
+  row: {
+    flexDirection: 'row',
+    justifyContent: 'space-between'
+  },
+  loaderContainer: {
+    alignItems: 'center',
+    justifyContent: 'center'
+  }
 });
