@@ -20,7 +20,7 @@ class Ring extends Component {
 
   props: RingProps;
 
-  constructor (props: RingProps) {
+  constructor(props: RingProps) {
     super(props);
     if (typeof props.size === 'number') {
       this.state.size = props.size;
@@ -50,27 +50,29 @@ class Ring extends Component {
       easing: Easing.bezier(0.5, 0.01, 0.5, 1)
     };
 
-    Animated.loop(Animated.timing(spins1, animationConfig)).start()
-
-    setTimeout(() => {
-      Animated.loop(Animated.timing(spins2, animationConfig)).start()
-    }, 150);
-
-    setTimeout(() => {
-      Animated.loop(Animated.timing(spins3, animationConfig)).start()
-    }, 225);
-
-    setTimeout(() => {
-      Animated.loop(Animated.timing(spins4, animationConfig)).start()
-    }, 300);
-
-    setTimeout(() => {
-      Animated.loop(Animated.timing(spins5, animationConfig)).start()
-    }, 375);
-
-    setTimeout(() => {
-      Animated.loop(Animated.timing(spins6, animationConfig)).start()
-    }, 450);
+    Animated.parallel([
+      Animated.loop(Animated.timing(spins1, animationConfig)),
+      Animated.sequence([
+        Animated.delay(150),
+        Animated.loop(Animated.timing(spins2, animationConfig))
+      ]),
+      Animated.sequence([
+        Animated.delay(225),
+        Animated.loop(Animated.timing(spins3, animationConfig))
+      ]),
+      Animated.sequence([
+        Animated.delay(300),
+        Animated.loop(Animated.timing(spins4, animationConfig))
+      ]),
+      Animated.sequence([
+        Animated.delay(375),
+        Animated.loop(Animated.timing(spins5, animationConfig)),
+      ]),
+      Animated.sequence([
+        Animated.delay(450),
+        Animated.loop(Animated.timing(spins6, animationConfig))
+      ])
+    ]).start()
 
     const offset = 8.4666664 / 2
     const getQuadrant = animation => {
@@ -123,11 +125,3 @@ class Ring extends Component {
 }
 
 export default Ring;
-
-const styles = StyleSheet.create({
-  wrapper: {
-    position: 'relative',
-    width: 100,
-    height: 100
-  }
-})
