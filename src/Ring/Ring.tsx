@@ -5,9 +5,10 @@ import { Svg, G, Path } from 'react-native-svg';
 const AnimatedG = Animated.createAnimatedComponent(G) as any;
 
 export interface RingProps {
+  /** @description The color of the loader. */
   color?: string;
 
-  /**@description The size of the loader icon. Defaults to 64 */
+  /** @description The size of the loader icon. Defaults to 64. */
   size?: number;
 }
 
