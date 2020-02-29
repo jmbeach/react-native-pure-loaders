@@ -17,7 +17,6 @@ class Ring extends Component {
     color: 'white',
     offset: 0,
     size: 64,
-    visible: true
   }
 
   appState: AppStateStatus;
@@ -66,12 +65,6 @@ class Ring extends Component {
   onAppStateChange = nextAppState => {
     console.log('onAppStateChange', nextAppState, new Date())
     if (this._isMounted) {
-      // console.log('resetting state');
-      // let newState = {
-      //   appState: nextAppState,
-      //   visible: nextAppState === 'active'
-      // };
-
       if (nextAppState !== 'active') {
         this.animation.stop();
         for (let spin of this.spins) {
@@ -82,18 +75,16 @@ class Ring extends Component {
         for (let i = 1; i < this.animations.length; i++) {
           setTimeout(() => {
             this.animations[i].start();
-          }, this.minDelay + (i * this.getFactor()));
+          }, this.minDelay + (i * this.getDelayFactor()));
         }
       }
 
-      // this.setState(newState);
       this.appState = nextAppState;
     }
   }
 
-  getFactor = () => {
+  getDelayFactor = () => {
     return (this.maxDelay - this.minDelay) / (this.spins.length - 1);
-
   }
 
   onLayout = Platform.OS === 'android'
@@ -113,14 +104,13 @@ class Ring extends Component {
     for (let i = 1; i < this.spins.length; i++) {
       this.animations.push(
         Animated.sequence([
-          Animated.delay(this.minDelay + (i * this.getFactor())),
+          Animated.delay(this.minDelay + (i * this.getDelayFactor())),
           Animated.loop(Animated.timing(this.spins[i], this.animationConfig))
         ]));
     }
 
     this.animation = Animated.parallel(this.animations);
     this.animation.start();
-
     const offset = 8.4666664 / 2
     const getQuadrant = (i: number, animation: Animated.Value) => {
       return (
@@ -158,18 +148,9 @@ class Ring extends Component {
           marginLeft: 8
         }}
           viewBox="0 0 8.4666664 8.4666664">
-          {
-            this.state.visible
-              ? (
-                <G transform={`translate(${offset}, ${offset})`}>
-                  {this.spins.map((_, i) => getQuadrant(i, this.spins[i]))}
-                </G>
-              )
-              : (
-                // Show stationary ring while resetting state
-                <Path fill={this.state.color} d="M4.295 0A4.233 4.233 0 001.24 1.24l.75.75a3.175 3.175 0 012.243-.932 3.175 3.175 0 012.244.932l.75-.75A4.233 4.233 0 004.295 0z" />
-              )
-          }
+          <G transform={`translate(${offset}, ${offset})`}>
+            {this.spins.map((_, i) => getQuadrant(i, this.spins[i]))}
+          </G>
         </Svg>
       </View>
     )
