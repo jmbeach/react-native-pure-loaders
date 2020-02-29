@@ -57,7 +57,7 @@ class Ring extends Component {
       easing: Easing.bezier(0.5, 0.01, 0.5, 1)
     };
     this.minDelay = 120;
-    this.maxDelay = 700;
+    this.maxDelay = 500;
     this.appState = AppState.currentState;
     AppState.addEventListener('change', this.onAppStateChange);
   }
@@ -74,7 +74,9 @@ class Ring extends Component {
         this.animations[0].start();
         for (let i = 1; i < this.animations.length; i++) {
           setTimeout(() => {
+            if (typeof this.animations[i] !== 'undefined') {
             this.animations[i].start();
+            }
           }, this.minDelay + (i * this.getDelayFactor()));
         }
       }
@@ -110,7 +112,11 @@ class Ring extends Component {
     }
 
     this.animation = Animated.parallel(this.animations);
+
+    if (Platform.OS !== 'android' || this.state.offset > 0) {
     this.animation.start();
+    }
+
     const offset = 8.4666664 / 2
     const getQuadrant = (i: number, animation: Animated.Value) => {
       return (
