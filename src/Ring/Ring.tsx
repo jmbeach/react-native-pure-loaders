@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { View, Animated, Easing, StyleSheet, Platform, LayoutChangeEvent } from 'react-native';
+import { View, Animated, Easing, Platform, LayoutChangeEvent, AppState } from 'react-native';
 import { Svg, G, Path } from 'react-native-svg';
 
 const AnimatedG = Animated.createAnimatedComponent(G) as any;
@@ -14,12 +14,24 @@ export interface RingProps {
 
 class Ring extends Component {
   state = {
+    appState: AppState.currentState,
     color: 'white',
     offset: 0,
     size: 64
   }
 
   props: RingProps;
+
+  animation: Animated.CompositeAnimation;
+
+  componentDidMount() {
+    console.log('mounted', new Date())
+    AppState.addEventListener('change', this.onAppStateChange)
+  }
+
+  componentWillUnmount() {
+    console.log('un-mounted', new Date())
+  }
 
   constructor(props: RingProps) {
     super(props);
@@ -32,17 +44,25 @@ class Ring extends Component {
     }
   }
 
+  onAppStateChange = nextAppState => {
+    this.animation.stop();
+    this.setState({
+      appState: nextAppState
+    }, () => {
+      // this.animation.start();
+    });
+  }
+
   onLayout = Platform.OS === 'android'
-    ? (e: LayoutChangeEvent) => { this.setState({ offset: e.nativeEvent.layout.width / 2 }) }
+    ? (e: LayoutChangeEvent) => {
+      this.setState({ offset: e.nativeEvent.layout.width / 2 }, () => {
+        // this.animation.start();
+      });
+    }
     : undefined;
 
   render() {
-    const spins1 = new Animated.Value(0);
-    const spins2 = new Animated.Value(0);
-    const spins3 = new Animated.Value(0);
-    const spins4 = new Animated.Value(0);
-    const spins5 = new Animated.Value(0);
-    const spins6 = new Animated.Value(0);
+    const spins = [...new Array(10)].map(x => new Animated.Value(0));
 
     const animationConfig = {
       toValue: 1,
@@ -51,34 +71,28 @@ class Ring extends Component {
       easing: Easing.bezier(0.5, 0.01, 0.5, 1)
     };
 
-    Animated.parallel([
-      Animated.loop(Animated.timing(spins1, animationConfig)),
-      Animated.sequence([
-        Animated.delay(150),
-        Animated.loop(Animated.timing(spins2, animationConfig))
-      ]),
-      Animated.sequence([
-        Animated.delay(225),
-        Animated.loop(Animated.timing(spins3, animationConfig))
-      ]),
-      Animated.sequence([
-        Animated.delay(300),
-        Animated.loop(Animated.timing(spins4, animationConfig))
-      ]),
-      Animated.sequence([
-        Animated.delay(375),
-        Animated.loop(Animated.timing(spins5, animationConfig)),
-      ]),
-      Animated.sequence([
-        Animated.delay(450),
-        Animated.loop(Animated.timing(spins6, animationConfig))
-      ])
-    ]).start()
+    const minDelay = 120;
+    const maxDelay = 500;
+
+    const delays: Animated.CompositeAnimation[] = [];
+    delays.push(Animated.loop(Animated.timing(spins[0], animationConfig)));
+    const factor = (maxDelay - minDelay) / (spins.length - 1);
+    for (let i = 1; i < spins.length; i++) {
+      delays.push(Animated.sequence([
+        Animated.delay(Math.round(minDelay + (i * factor))),
+        Animated.loop(Animated.timing(spins[i], animationConfig))
+      ]));
+    }
+
+    this.animation = Animated.parallel(delays);
+    if (Platform.OS !== 'android') {
+      this.animation.start();
+    }
 
     const offset = 8.4666664 / 2
-    const getQuadrant = animation => {
+    const getQuadrant = (i: number, animation: Animated.Value) => {
       return (
-        <AnimatedG style={{
+        <AnimatedG key={i} style={{
           transform: [
             {
               translateX: -this.state.offset
@@ -112,12 +126,7 @@ class Ring extends Component {
         }}
           viewBox="0 0 8.4666664 8.4666664">
           <G transform={`translate(${offset}, ${offset})`}>
-            {getQuadrant(spins1)}
-            {getQuadrant(spins2)}
-            {getQuadrant(spins3)}
-            {getQuadrant(spins4)}
-            {getQuadrant(spins5)}
-            {getQuadrant(spins6)}
+            {spins.map((_, i) => getQuadrant(i, spins[i]))}
           </G>
         </Svg>
       </View>
