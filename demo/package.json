@@ -7,7 +7,8 @@
     "ios": "expo start --ios",
     "web": "expo start --web",
     "eject": "expo eject",
-    "get-lib": "cpx ../lib/**/* ./lib"
+    "get-lib": "cpx ../lib/**/* ./lib",
+    "watch": "cpx ../lib/**/* ./lib --watch"
   },
   "dependencies": {
     "expo": "~36.0.0",
