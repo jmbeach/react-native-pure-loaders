@@ -7,10 +7,10 @@ export default function App() {
     <View style={styles.container}>
       <View style={styles.row}>
         <View style={styles.loaderContainer}>
-          <Loaders.Ring color="#FFD533" size={128} />
+          <Loaders.Ring color="#FFD533" size={128} id="A" />
         </View>
         <View style={styles.loaderContainer}>
-          <Loaders.Ring />
+          <Loaders.Ring id="B" />
         </View>
       </View>
       <View style={styles.captionContainer}>
