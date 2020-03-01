@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { View, Animated, Easing, Platform, LayoutChangeEvent, AppState } from 'react-native';
+import { View, Animated, Easing, Platform, LayoutChangeEvent, AppState, AppStateStatus } from 'react-native';
 import { Svg, G, Path } from 'react-native-svg';
 
 const AnimatedG = Animated.createAnimatedComponent(G) as any;
@@ -14,23 +14,27 @@ export interface RingProps {
 
 class Ring extends Component {
   state = {
-    appState: AppState.currentState,
     color: 'white',
     offset: 0,
-    size: 64
+    size: 64,
   }
 
+  appState: AppStateStatus;
+  animationConfig: any;
+  minDelay: number;
+  maxDelay: number;
   props: RingProps;
-
+  spins: Animated.Value[];
   animation: Animated.CompositeAnimation;
+  animations: Animated.CompositeAnimation[];
+  _isMounted: boolean;
 
   componentDidMount() {
-    console.log('mounted', new Date())
-    AppState.addEventListener('change', this.onAppStateChange)
+    this._isMounted = true;
   }
 
   componentWillUnmount() {
-    console.log('un-mounted', new Date())
+    this._isMounted = false;
   }
 
   constructor(props: RingProps) {
@@ -42,51 +46,73 @@ class Ring extends Component {
     if (typeof props.color === 'string') {
       this.state.color = props.color;
     }
-  }
 
-  onAppStateChange = nextAppState => {
-    this.animation.stop();
-    this.setState({
-      appState: nextAppState
-    }, () => {
-      // this.animation.start();
-    });
-  }
-
-  onLayout = Platform.OS === 'android'
-    ? (e: LayoutChangeEvent) => {
-      this.setState({ offset: e.nativeEvent.layout.width / 2 }, () => {
-        // this.animation.start();
-      });
-    }
-    : undefined;
-
-  render() {
-    const spins = [...new Array(10)].map(x => new Animated.Value(0));
-
-    const animationConfig = {
+    this.animationConfig = {
       toValue: 1,
       duration: 1200,
       useNativeDriver: true,
       easing: Easing.bezier(0.5, 0.01, 0.5, 1)
     };
+    this.minDelay = 120;
+    this.maxDelay = 500;
+    this.appState = AppState.currentState;
+    AppState.addEventListener('change', this.onAppStateChange);
+  }
 
-    const minDelay = 120;
-    const maxDelay = 500;
+  onAppStateChange = nextAppState => {
+    if (this._isMounted) {
+      if (nextAppState !== 'active') {
+        this.animation.stop();
+        for (let spin of this.spins) {
+          spin.setValue(0);
+        }
+      } else if (this.appState !== 'active') {
+        this.animations[0].start();
+        for (let i = 1; i < this.animations.length; i++) {
+          setTimeout(() => {
+            if (typeof this.animations[i] !== 'undefined') {
+              this.animations[i].start();
+            }
+          }, this.minDelay + (i * this.getDelayFactor()));
+        }
+      }
 
-    const delays: Animated.CompositeAnimation[] = [];
-    delays.push(Animated.loop(Animated.timing(spins[0], animationConfig)));
-    const factor = (maxDelay - minDelay) / (spins.length - 1);
-    for (let i = 1; i < spins.length; i++) {
-      delays.push(Animated.sequence([
-        Animated.delay(Math.round(minDelay + (i * factor))),
-        Animated.loop(Animated.timing(spins[i], animationConfig))
-      ]));
+      this.appState = nextAppState;
     }
+  }
 
-    this.animation = Animated.parallel(delays);
-    if (Platform.OS !== 'android') {
-      this.animation.start();
+  getDelayFactor = () => {
+    return (this.maxDelay - this.minDelay) / (this.spins.length - 1);
+  }
+
+  onLayout = Platform.OS === 'android'
+    ? (e: LayoutChangeEvent) => {
+      if (this.state.offset === 0) {
+        this.setState({ offset: e.nativeEvent.layout.width / 2 }, () => {
+          this.animation.start();
+        });
+      }
+    }
+    : undefined;
+
+  render() {
+    if (typeof this.spins === 'undefined' || this.spins.length === 0) {
+      this.spins = [...new Array(10)].map(x => new Animated.Value(0));
+      this.animations = [];
+      this.animations.push(Animated.loop(Animated.timing(this.spins[0], this.animationConfig)));
+      for (let i = 1; i < this.spins.length; i++) {
+        this.animations.push(
+          Animated.sequence([
+            Animated.delay(this.minDelay + (i * this.getDelayFactor())),
+            Animated.loop(Animated.timing(this.spins[i], this.animationConfig))
+          ]));
+      }
+  
+      this.animation = Animated.parallel(this.animations);
+  
+      if (Platform.OS !== 'android') {
+        this.animation.start();
+      }
     }
 
     const offset = 8.4666664 / 2
@@ -120,13 +146,14 @@ class Ring extends Component {
         height: this.state.size * 1.1,
         width: this.state.size * 1.1
       }}>
+
         <Svg onLayout={this.onLayout} width={this.state.size} height={this.state.size} style={{
           marginTop: 8,
           marginLeft: 8
         }}
           viewBox="0 0 8.4666664 8.4666664">
           <G transform={`translate(${offset}, ${offset})`}>
-            {spins.map((_, i) => getQuadrant(i, spins[i]))}
+            {this.spins.map((_, i) => getQuadrant(i, this.spins[i]))}
           </G>
         </Svg>
       </View>
