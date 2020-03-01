@@ -31,12 +31,10 @@ class Ring extends Component {
 
   componentDidMount() {
     this._isMounted = true;
-    console.log('mounted', new Date())
   }
 
   componentWillUnmount() {
     this._isMounted = false;
-    console.log('un-mounted', new Date())
   }
 
   constructor(props: RingProps) {
@@ -49,7 +47,6 @@ class Ring extends Component {
       this.state.color = props.color;
     }
 
-    console.log('================================')
     this.animationConfig = {
       toValue: 1,
       duration: 1200,
@@ -63,7 +60,6 @@ class Ring extends Component {
   }
 
   onAppStateChange = nextAppState => {
-    console.log('onAppStateChange', nextAppState, new Date())
     if (this._isMounted) {
       if (nextAppState !== 'active') {
         this.animation.stop();
@@ -75,7 +71,7 @@ class Ring extends Component {
         for (let i = 1; i < this.animations.length; i++) {
           setTimeout(() => {
             if (typeof this.animations[i] !== 'undefined') {
-            this.animations[i].start();
+              this.animations[i].start();
             }
           }, this.minDelay + (i * this.getDelayFactor()));
         }
@@ -91,30 +87,32 @@ class Ring extends Component {
 
   onLayout = Platform.OS === 'android'
     ? (e: LayoutChangeEvent) => {
-      this.setState({ offset: e.nativeEvent.layout.width / 2 }, () => {
-        this.animation.start();
-      });
+      if (this.state.offset === 0) {
+        this.setState({ offset: e.nativeEvent.layout.width / 2 }, () => {
+          this.animation.start();
+        });
+      }
     }
     : undefined;
 
   render() {
-    console.log('render', new Date())
-    this.spins = [...new Array(10)].map(x => new Animated.Value(0));
-    this.animations = [];
-
-    this.animations.push(Animated.loop(Animated.timing(this.spins[0], this.animationConfig)));
-    for (let i = 1; i < this.spins.length; i++) {
-      this.animations.push(
-        Animated.sequence([
-          Animated.delay(this.minDelay + (i * this.getDelayFactor())),
-          Animated.loop(Animated.timing(this.spins[i], this.animationConfig))
-        ]));
-    }
-
-    this.animation = Animated.parallel(this.animations);
-
-    if (Platform.OS !== 'android' || this.state.offset > 0) {
-    this.animation.start();
+    if (typeof this.spins === 'undefined' || this.spins.length === 0) {
+      this.spins = [...new Array(10)].map(x => new Animated.Value(0));
+      this.animations = [];
+      this.animations.push(Animated.loop(Animated.timing(this.spins[0], this.animationConfig)));
+      for (let i = 1; i < this.spins.length; i++) {
+        this.animations.push(
+          Animated.sequence([
+            Animated.delay(this.minDelay + (i * this.getDelayFactor())),
+            Animated.loop(Animated.timing(this.spins[i], this.animationConfig))
+          ]));
+      }
+  
+      this.animation = Animated.parallel(this.animations);
+  
+      if (Platform.OS !== 'android') {
+        this.animation.start();
+      }
     }
 
     const offset = 8.4666664 / 2
