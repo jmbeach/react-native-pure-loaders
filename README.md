@@ -2,7 +2,7 @@
 
 React native loading spinners based on the ones found at [https://loading.io/css/](https://loading.io/css/).
 
-Currently, the only loader is <Loader.Ring>. It can be seen below in the Demo.
+Currently, the only loaders are <Loader.Ring> and <Loaders.Ellipses>. They can be seen below in the Demo.
 
 ## Demo
 
@@ -33,6 +33,13 @@ export default function App() {
 ```
 
 ## API
+
+### Loaders.Ellipses
+
+**props**
+
+- *color*: string - The color of the loader.
+- *size*: number - The size of the loader icon. Defaults to 64.
 
 ### Loaders.Ring
 
