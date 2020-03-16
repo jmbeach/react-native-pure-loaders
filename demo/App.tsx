@@ -7,6 +7,17 @@ export default function App() {
     <View style={styles.container}>
       <View style={styles.row}>
         <View style={styles.loaderContainer}>
+          <Loaders.Ellipses color="#FFD533" size={128} id="EllipsesA" />
+        </View>
+        <View style={styles.loaderContainer}>
+          <Loaders.Ellipses id="EllipsesB" />
+        </View>
+      </View>
+      <View style={styles.captionContainer}>
+        <Text style={styles.caption}>{'<Loaders.Ellipses />'}</Text>
+      </View>
+      <View style={styles.row}>
+        <View style={styles.loaderContainer}>
           <Loaders.Ring color="#FFD533" size={128} id="A" />
         </View>
         <View style={styles.loaderContainer}>
@@ -40,6 +51,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between'
   },
   loaderContainer: {
+    margin: 20,
     alignItems: 'center',
     justifyContent: 'center'
   }
