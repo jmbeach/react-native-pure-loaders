@@ -1,5 +1,5 @@
 import React from 'react';
-import { Animated, Easing } from 'react-native';
+import { Animated, Easing, Platform } from 'react-native';
 import { Svg, Circle } from 'react-native-svg';
 import LoaderProps from '../LoaderProps';
 
@@ -9,12 +9,24 @@ const ellipses = (props: LoaderProps) => {
   const color = props.color || 'white';
   const size = props.size || 64;
   const animation = new Animated.Value(0);
-  Animated.loop(Animated.timing(animation, {
+  const baseAnimation = Animated.timing(animation, {
     toValue: 1,
     duration: 600,
     easing: Easing.bezier(0.5, 0.01, 0.5, 1),
     useNativeDriver: true
-  })).start();
+  });
+  if (Platform.OS === 'web') {
+    // Animated.loop doesn't seem to work on web, but this work-around does
+    const customLoop = () => {
+      baseAnimation.start(() => {
+        animation.setValue(0);
+        customLoop();
+      });
+    }
+    customLoop();
+  } else {
+    Animated.loop(baseAnimation).start();
+  }
   let inputRange: number[] = [];
   let outputRange: number[] = [];
 
