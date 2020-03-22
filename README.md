@@ -6,6 +6,8 @@ Currently, the only loaders are <Loader.Ring> and <Loaders.Ellipses>. They can b
 
 ## Demo
 
+[Live snack demo](https://snack.expo.io/@jmbeach/react-native-pure-loaders-demo)
+
 ![demo](./assets/preview.gif)
 
 ## Installation
