@@ -100,20 +100,47 @@ class Ring extends Component {
     if (typeof this.spins === 'undefined' || this.spins.length === 0) {
       this.spins = [...new Array(5)].map(x => new Animated.Value(0));
       this.animations = [];
-      this.animations.push(Animated.loop(Animated.timing(this.spins[0], this.animationConfig)));
-      for (let i = 1; i < this.spins.length; i++) {
-        const delay = this.getDelay(i);
-        this.animations.push(
-          Animated.sequence([
-            Animated.delay(delay),
-            Animated.loop(Animated.timing(this.spins[i], this.animationConfig))
-          ]));
+      if (Platform.OS === 'web') {
+        for (let i = 0; i < this.spins.length; i++) {
+          this.animations.push(
+            Animated.timing(this.spins[i], this.animationConfig))
+        }
+      } else {
+        this.animations.push(Animated.loop(Animated.timing(this.spins[0], this.animationConfig)));
+        for (let i = 1; i < this.spins.length; i++) {
+          const delay = this.getDelay(i);
+          this.animations.push(
+            Animated.sequence([
+              Animated.delay(delay),
+              Animated.loop(Animated.timing(this.spins[i], this.animationConfig))
+            ]));
+        }
       }
 
-      this.animation = Animated.parallel(this.animations);
+      if (Platform.OS === 'web') {
+        for (let i = 0; i < this.spins.length; i++) {
+          const loop = (animation: Animated.CompositeAnimation, spin: Animated.Value, delay: number, useTimeout: boolean) => {
+            const afterDelay = () => {
+              animation.start(() => {
+              spin.setValue(0);
+                loop(animation, spin, delay, false);
+              })
+            };
+            if (useTimeout) {
+              setTimeout(afterDelay, delay);
+            } else {
+              afterDelay();
+            }
+          }
 
-      if (Platform.OS !== 'android') {
-        this.animation.start();
+          loop(this.animations[i], this.spins[i], this.getDelay(i), true);
+        }
+      } else {
+        this.animation = Animated.parallel(this.animations);
+
+        if (Platform.OS !== 'android') {
+          this.animation.start();
+        }
       }
     }
 
