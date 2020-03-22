@@ -1,10 +1,11 @@
 import React from 'react';
 import { Animated, Easing } from 'react-native';
 import { Svg, Circle } from 'react-native-svg';
+import LoaderProps from '../LoaderProps';
 
 const AnimatedCircle = Animated.createAnimatedComponent(Circle) as any;
 
-const ellipses = (props) => {
+const ellipses = (props: LoaderProps) => {
   const color = props.color || 'white';
   const size = props.size || 64;
   const animation = new Animated.Value(0);
@@ -100,10 +101,10 @@ function getScaleAnimation(inputRange: number[], outputRange: number[], animatio
 function getReverseScaleAnimation(isX: boolean, animation: Animated.Value) {
   let inputCopy: number[] = []
   let outputCopy: number[] = []
-  const getX = i => {
+  const getX = (i: number) => {
     return ((35 / i) - 35)
   };
-  const getY = i => {
+  const getY = (i: number) => {
     return (5 / i) - 5
   };
   for (let i = 0.001; i < 0.9; i += 0.01) {

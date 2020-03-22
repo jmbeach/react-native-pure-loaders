@@ -10,7 +10,7 @@
       "es6"
     ],
     "moduleResolution": "node",
-    "noImplicitAny": false,
+    "noImplicitAny": true,
     "outDir": "lib",
     "strict": true,
     "strictPropertyInitialization": false,

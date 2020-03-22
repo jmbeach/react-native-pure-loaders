@@ -2,23 +2,20 @@ import React, { Component } from 'react';
 import { View, Animated, Easing, Platform, LayoutChangeEvent, AppState, AppStateStatus } from 'react-native';
 import { Svg, G, Path } from 'react-native-svg';
 import Interpolator from '../Interpolator';
+import LoaderProps from '../LoaderProps';
 
 const AnimatedG = Animated.createAnimatedComponent(G) as any;
 
-export interface RingProps {
-  /** @description The color of the loader. */
-  color?: string;
-
-  /** @description The size of the loader icon. Defaults to 64. */
-  size?: number;
-  id?: string;
+export interface RingState {
+  offset: number;
 }
 
+export interface RingProps extends LoaderProps {
+  id?: string;
+}
 class Ring extends Component {
   state = {
-    color: 'white',
-    offset: 0,
-    size: 64,
+    offset: 0
   }
 
   appState: AppStateStatus;
@@ -39,15 +36,8 @@ class Ring extends Component {
     this._isMounted = false;
   }
 
-  constructor(props: RingProps) {
+  constructor(props: LoaderProps) {
     super(props);
-    if (typeof props.size === 'number') {
-      this.state.size = props.size;
-    }
-
-    if (typeof props.color === 'string') {
-      this.state.color = props.color;
-    }
 
     this.animationConfig = {
       toValue: 1,
@@ -60,12 +50,12 @@ class Ring extends Component {
       input: [64, 128],
       output: [445, 500]
     });
-    this.maxDelay = maxDelayInterpolator(this.state.size);
+    this.maxDelay = maxDelayInterpolator(this.props.size || 64);
     this.appState = AppState.currentState;
     AppState.addEventListener('change', this.onAppStateChange);
   }
 
-  onAppStateChange = nextAppState => {
+  onAppStateChange = (nextAppState: any) => {
     if (this._isMounted) {
       if (nextAppState !== 'active') {
         for (let spin of this.spins) {
@@ -90,7 +80,7 @@ class Ring extends Component {
     return (this.maxDelay - this.minDelay) / (this.spins.length - 2);
   }
 
-  getDelay = i => {
+  getDelay = (i: number) => {
     return Math.round(this.minDelay + ((i - 1) * this.getDelayFactor()));
   }
 
@@ -105,6 +95,8 @@ class Ring extends Component {
     : undefined;
 
   render() {
+    const size = this.props.size || 64;
+    const color = this.props.color || 'white';
     if (typeof this.spins === 'undefined' || this.spins.length === 0) {
       this.spins = [...new Array(5)].map(x => new Animated.Value(0));
       this.animations = [];
@@ -146,7 +138,7 @@ class Ring extends Component {
           ]
         }}>
           <G transform={`translate(-${offset}, -${offset})`}>
-            <Path fill={this.state.color} d="M4.295 0A4.233 4.233 0 001.24 1.24l.75.75a3.175 3.175 0 012.243-.932 3.175 3.175 0 012.244.932l.75-.75A4.233 4.233 0 004.295 0z" />
+            <Path fill={color} d="M4.295 0A4.233 4.233 0 001.24 1.24l.75.75a3.175 3.175 0 012.243-.932 3.175 3.175 0 012.244.932l.75-.75A4.233 4.233 0 004.295 0z" />
           </G>
         </AnimatedG>
       )
@@ -154,11 +146,11 @@ class Ring extends Component {
     return (
       <View style={{
         position: 'relative',
-        height: this.state.size * 1.1,
-        width: this.state.size * 1.1
+        height: size * 1.1,
+        width: size * 1.1
       }}>
 
-        <Svg onLayout={this.onLayout} width={this.state.size} height={this.state.size} style={{
+        <Svg onLayout={this.onLayout} width={size} height={size} style={{
           marginTop: 8,
           marginLeft: 8
         }}
