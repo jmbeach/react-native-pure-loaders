@@ -13,7 +13,8 @@
   "devDependencies": {
     "@types/react": "^16.9.23",
     "@types/react-native": "^0.61.17",
-    "react-native-svg": "^11.0.1"
+    "react-native-svg": "^11.0.1",
+    "typescript": "^4.2.4"
   },
   "scripts": {
     "prepack": "tsc --build tsconfig.json",
