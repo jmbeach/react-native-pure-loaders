@@ -1,4 +1,5 @@
-# react-native-pure-loaders
+# react-native-pure-loaders [![Pure Loaders](https://circleci.com/gh/jmbeach/react-native-pure-loaders.svg?style=svg)](https://circleci.com/gh/jmbeach/react-native-pure-loaders)
+
 
 React native loading spinners based on the ones found at [https://loading.io/css/](https://loading.io/css/).
 
