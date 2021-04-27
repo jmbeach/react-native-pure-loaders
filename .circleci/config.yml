@@ -6,10 +6,6 @@ jobs:
     docker:
       - image: cimg/node:14.0.0
     steps:
-    - restore_cache:
-        name: Restore Yarn Package Cache
-        keys:
-          - yarn-packages-{{ checksum "yarn.lock" }}
     - run:
         name: Install Dependencies
         command: yarn install --frozen-lockfile --cache-folder ~/.cache/yarn
