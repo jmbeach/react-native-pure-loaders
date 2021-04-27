@@ -84,16 +84,6 @@ class Ring extends Component {
     return Math.round(this.minDelay + ((i - 1) * this.getDelayFactor()));
   }
 
-  onLayout = Platform.OS === 'android'
-    ? (e: LayoutChangeEvent) => {
-      if (this.state.offset === 0) {
-        this.setState({ offset: e.nativeEvent.layout.width / 2 }, () => {
-          this.animation.start();
-        });
-      }
-    }
-    : undefined;
-
   render() {
     const size = this.props.size || 64;
     const color = this.props.color || 'white';
@@ -138,9 +128,7 @@ class Ring extends Component {
       } else {
         this.animation = Animated.parallel(this.animations);
 
-        if (Platform.OS !== 'android') {
-          this.animation.start();
-        }
+        this.animation.start();
       }
     }
 
@@ -177,7 +165,7 @@ class Ring extends Component {
         width: size * 1.1
       }}>
 
-        <Svg onLayout={this.onLayout} width={size} height={size} style={{
+        <Svg width={size} height={size} style={{
           marginTop: 8,
           marginLeft: 8
         }}
