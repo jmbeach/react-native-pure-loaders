@@ -3,7 +3,7 @@
 
 React native loading spinners based on the ones found at [https://loading.io/css/](https://loading.io/css/).
 
-Currently, the only loaders are <Loader.Ring> and <Loaders.Ellipses>. They can be seen below in the Demo.
+Currently, the only loaders are `<Loader.Ring>` and `<Loaders.Ellipses>`. They can be seen below in the Demo.
 
 ## Demo
 
