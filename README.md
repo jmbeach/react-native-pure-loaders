@@ -24,7 +24,7 @@ or
 Example usage:
 
 ```js
-import Loaders from './lib/index';
+import Loaders from 'react-native-pure-loaders';
 
 export default function App() {
   return (
